@@ -33,5 +33,5 @@ python setup.py install -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 rm -rf $RPM_BUILD_ROOT
 rm -rf ${_builddir}/%{name}
 
-%files -f %{pname}/INSTALLED_FILES
+%files -f %{name}/INSTALLED_FILES
 %defattr(-,root,root)
