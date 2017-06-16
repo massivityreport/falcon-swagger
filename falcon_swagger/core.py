@@ -116,8 +116,9 @@ def format_response(info, method_name):
         del info['response']
         info['responses'] = responses
 
-    if 'responses' not in info:
-        raise Exception('Missing required response info for %s' % method_name)
+class NoSwaggerException(Exception):
+    def __init__(self, method_name):
+        super(NoSwaggerException, self)('No swagger description for %s' % method_name)
 
 def build_method_info(resource, path, method):
     method_name = '%s.on_%s()' % (resource.__name__, method)
@@ -125,7 +126,7 @@ def build_method_info(resource, path, method):
     try:
         info = getattr(resource, 'on_%s' % method).__swagger__
     except:
-        raise Exception('missing swagger decorator for %s' % method_name)
+        raise NoSwaggerException(method_name)
 
     format_parameters(info, path, method_name)
     format_response(info, method_name)
@@ -155,13 +156,16 @@ def build_swagger_def(app):
     assert(isinstance(app, falcon.api.API))
 
     resources = build_resource_list(app._router._roots)
-    resources_info = dict([(path, build_resource_info(resource, path)) for path, resource in resources])
-
-    info = app.__swagger__
+    resources_info = {}
+    for path, resource in resources:
+        try:
+            resources_info[path] = build_resource_info(resource, path)
+        except NoSwaggerException as e:
+            pass
 
     return {
         'swagger': '2.0',
-        'info': info,
+        'info': app.__swagger__,
         'produces': [app._media_type],
         'paths': resources_info
     }
