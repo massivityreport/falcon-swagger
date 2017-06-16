@@ -118,7 +118,7 @@ def format_response(info, method_name):
 
 class NoSwaggerException(Exception):
     def __init__(self, method_name):
-        super(NoSwaggerException, self)('No swagger description for %s' % method_name)
+        super(NoSwaggerException, self).__init__('No swagger description for %s' % method_name)
 
 def build_method_info(resource, path, method):
     method_name = '%s.on_%s()' % (resource.__name__, method)
