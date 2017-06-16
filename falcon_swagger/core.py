@@ -7,6 +7,7 @@ import os
 import os.path as osp
 import falcon
 from falcon import api_helpers as helpers
+import copy
 
 #
 # API decorators and classes
@@ -128,10 +129,11 @@ def build_method_info(resource, path, method):
     except:
         raise NoSwaggerException(method_name)
 
-    format_parameters(info, path, method_name)
-    format_response(info, method_name)
+    swagger_info = copy.deepcopy(info)
+    format_parameters(swagger_info, path, method_name)
+    format_response(swagger_info, method_name)
 
-    return info
+    return swagger_info
 
 def build_resource_info(resource, path):
     info = dict()
