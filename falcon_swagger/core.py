@@ -159,7 +159,9 @@ def build_swagger_def(app):
 
     resources = build_resource_list(app._router._roots)
     resources_info = {}
-    for path, resource in resources:
+    for path, resource in sorted(resources, key=lambda x: x[0]):
+        if path == '/swagger.json':
+            continue
         try:
             resources_info[path] = build_resource_info(resource, path)
         except NoSwaggerException as e:
