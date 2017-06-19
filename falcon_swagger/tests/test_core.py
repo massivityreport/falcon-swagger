@@ -29,35 +29,29 @@ class TargetingControlStoreUnittests(unittest.TestCase):
                     self.format_success(resp=resp,
                                         content=self.store.get_active_campaign())
                 except:
-                    self.format_error(resp=resp, error_msg=format_exc())    
+                    self.format_error(resp=resp, error_msg=format_exc())
 
         app = API()
-        swaggerify(app, 'test-api', '2.0.0')
+        swaggerify(app, 'test-api', '2.0.0', host="localhost")
         app.add_route('/test/active-campaign', TestResource())
 
         expected = {
-            'info': {'version': '2.0.0', 'name': 'test-api'}, 
+            'info': {'version': '2.0.0', 'name': 'test-api', 'host': 'localhost'},
             'paths': {
                 '/test/active-campaign': {
                     'get': {
-                        'tags': ['campaign'], 
+                        'tags': ['campaign'],
                         'responses': {
-                            '200': {'description': 'Get succeed'}, 
+                            '200': {'description': 'Get succeed'},
                             '404': {'description': 'Impossible to retrieve the active campaign'}
                         },
-                        'parameters': [], 
+                        'parameters': [],
                         'summary': 'Get active campaign'}
-                },
-                '/swagger.json': {
-                    'get': {
-                        'responses': {
-                            '200': 'the swagger config'}, 
-                            'parameters': [], 
-                            'summary': 'swagger description'}
                 }
-            }, 
-            'swagger': '2.0', 
-            'produces': ['application/json; charset=UTF-8']
-        }   
+            },
+            'swagger': '2.0',
+            'produces': ['application/json; charset=utf-8']
+        }
         swagger_def = build_swagger_def(app)
+        self.maxDiff = None
         self.assertEquals(expected, swagger_def)

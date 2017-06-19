@@ -57,10 +57,12 @@ class CorsMiddleware(object):
     def process_request(self, request, response):
         response.set_header('Access-Control-Allow-Origin', '*')
 
-def swaggerify(app, name, version):
+def swaggerify(app, name, version, **kwargs):
     assert(isinstance(app, falcon.api.API))
 
-    falcon.API.__swagger__ = {'name': name, 'version': version }
+    infos = {'name': name, 'version': version }
+    infos.update(kwargs)
+    falcon.API.__swagger__ = infos
     app._middleware += helpers.prepare_middleware([CorsMiddleware()])
     app.add_route('/swagger.json', SwaggerConfigResource(app))
 
