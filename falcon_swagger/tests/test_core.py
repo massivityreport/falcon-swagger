@@ -50,7 +50,7 @@ class TargetingControlStoreUnittests(unittest.TestCase):
                 }
             },
             'swagger': '2.0',
-            'produces': ['application/json; charset=utf-8']
+            'produces': ['application/json; charset=UTF-8']
         }
         swagger_def = build_swagger_def(app)
         self.maxDiff = None
