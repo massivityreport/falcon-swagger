@@ -1,6 +1,7 @@
 """ Unit tests for falcon swagger """
 import unittest
 import json
+from collections import OrderedDict
 
 from falcon import API
 
@@ -13,9 +14,7 @@ class TargetingControlStoreUnittests(unittest.TestCase):
     """ Unit tests for the Targeting Control store.
     """
 
-    def test_targeting_control_store_1(self):
-        """ Test _get_date_iso.
-        """
+    def test_build_swagger_def_1(self):
         class TestResource(object):
             @swagger(summary='Get active campaign',
                      responses={'200': {'description': 'Get succeed'},
@@ -37,7 +36,7 @@ class TargetingControlStoreUnittests(unittest.TestCase):
 
         expected = {
             'info': {'version': '2.0.0', 'name': 'test-api', 'host': 'localhost'},
-            'paths': {
+            'paths': OrderedDict({
                 '/test/active-campaign': {
                     'get': {
                         'tags': ['campaign'],
@@ -48,10 +47,35 @@ class TargetingControlStoreUnittests(unittest.TestCase):
                         'parameters': [],
                         'summary': 'Get active campaign'}
                 }
-            },
+            }),
             'swagger': '2.0',
-            'produces': ['application/json; charset=UTF-8']
+            'produces': [app._media_type]
         }
         swagger_def = build_swagger_def(app)
         self.maxDiff = None
         self.assertEquals(expected, swagger_def)
+
+    def test_build_swagger_def_2(self):
+        class TestResource(object):
+            @swagger(summary='test')
+            def on_get(self, req, resp):
+                pass
+
+        app = API()
+        swaggerify(app, 'test-api', '2.0.0', host="localhost")
+        app.add_route('/test/', TestResource())
+        app.add_route('/test/list/item', TestResource())
+        app.add_route('/test/list', TestResource())
+        app.add_route('/pipo', TestResource())
+        app.add_route('/bla', TestResource())
+
+        expected = [
+            '/bla',
+            '/pipo',
+            '/test',
+            '/test/list',
+            '/test/list/item'
+            ]
+        swagger_def = build_swagger_def(app)
+        self.maxDiff = None
+        self.assertEquals(expected, swagger_def['paths'].keys())

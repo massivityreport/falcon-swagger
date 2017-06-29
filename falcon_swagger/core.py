@@ -8,6 +8,7 @@ import os.path as osp
 import falcon
 from falcon import api_helpers as helpers
 import copy
+from collections import OrderedDict
 
 #
 # API decorators and classes
@@ -160,7 +161,7 @@ def build_swagger_def(app):
     assert(isinstance(app, falcon.api.API))
 
     resources = build_resource_list(app._router._roots)
-    resources_info = {}
+    resources_info = OrderedDict()
     for path, resource in sorted(resources, key=lambda x: x[0]):
         if path == '/swagger.json':
             continue
