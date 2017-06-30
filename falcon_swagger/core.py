@@ -61,9 +61,10 @@ class CorsMiddleware(object):
 def swaggerify(app, name, version, **kwargs):
     assert(isinstance(app, falcon.api.API))
 
-    infos = {'name': name, 'version': version }
-    infos.update(kwargs)
-    falcon.API.__swagger__ = infos
+    swagger_def = {'info': {'name': name, 'version': version }}
+    swagger_def['info'].update(kwargs.pop('info', {}))
+    swagger_def.update(kwargs)
+    falcon.API.__swagger__ = swagger_def
     app._middleware += helpers.prepare_middleware([CorsMiddleware()])
     app.add_route('/swagger.json', SwaggerConfigResource(app))
 
@@ -170,12 +171,14 @@ def build_swagger_def(app):
         except NoSwaggerException as e:
             pass
 
-    return {
+    swagger_def = app.__swagger__
+    swagger_def.update({
         'swagger': '2.0',
-        'info': app.__swagger__,
         'produces': [app._media_type],
         'paths': resources_info
-    }
+    })
+
+    return swagger_def
 
 def build_swagger_def_for_api(falcon_api):
     falcon_api_module, falcon_api_app = falcon_api.split(':')

@@ -31,11 +31,12 @@ class TargetingControlStoreUnittests(unittest.TestCase):
                     self.format_error(resp=resp, error_msg=format_exc())
 
         app = API()
-        swaggerify(app, 'test-api', '2.0.0', host="localhost")
+        swaggerify(app, 'test-api', '2.0.0', host="localhost", info={"bla": "test"})
         app.add_route('/test/active-campaign', TestResource())
 
         expected = {
-            'info': {'version': '2.0.0', 'name': 'test-api', 'host': 'localhost'},
+            'info': {'version': '2.0.0', 'name': 'test-api', 'bla': 'test'},
+            'host': 'localhost',
             'paths': OrderedDict({
                 '/test/active-campaign': {
                     'get': {
