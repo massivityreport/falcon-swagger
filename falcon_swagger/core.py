@@ -47,8 +47,10 @@ class SwaggerConfigResource(SwaggerResource):
 
     @swagger(summary="swagger description", response="the swagger config")
     def on_get(self, req, resp):
-        if self.swagger_def == None:
-            self.swagger_def = build_swagger_def(self.app)
+        prefix = req.get_header('X-Script-Name', None)
+        refresh = req.get_param('refresh', False)
+        if refresh or self.swagger_def == None:
+            self.swagger_def = build_swagger_def(self.app, prefix=prefix)
 
         resp.status = falcon.HTTP_200
         resp.body = json.dumps(self.swagger_def)
@@ -158,7 +160,7 @@ def build_resource_list(nodes, path=''):
 
     return resource_list
 
-def build_swagger_def(app):
+def build_swagger_def(app, prefix=None):
     assert(isinstance(app, falcon.api.API))
 
     resources = build_resource_list(app._router._roots)
@@ -167,7 +169,9 @@ def build_swagger_def(app):
         if path == '/swagger.json':
             continue
         try:
-            resources_info[path] = build_resource_info(resource, path)
+            resource_info = build_resource_info(resource, path)
+            resource_path = "/%s%s" % (prefix, path) if prefix else path
+            resources_info[resource_path] = resource_info
         except NoSwaggerException as e:
             pass
 
