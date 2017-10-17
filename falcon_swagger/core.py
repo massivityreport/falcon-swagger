@@ -170,7 +170,7 @@ def build_swagger_def(app, prefix=None):
             continue
         try:
             resource_info = build_resource_info(resource, path)
-            resource_path = "/%s%s" % (prefix, path) if prefix else path
+            resource_path = "%s%s" % (prefix, path) if prefix else path
             resources_info[resource_path] = resource_info
         except NoSwaggerException as e:
             pass
